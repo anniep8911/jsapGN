@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+
+        /* ( 크롬, 사파리, 오페라, 엣지 ) 동작 */
+        .scroll::-webkit-scrollbar {
+        display: none;
+        }
+
+        .scroll {
+        -ms-overflow-style: none; /* 인터넷 익스플로러 */
+        scrollbar-width: none; /* 파이어폭스 */
+        }
+        
+        body{
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            margin: 0;padding: 0;
+            -ms-overflow-style: none; /* 인터넷 익스플로러 */
+            scrollbar-width: none; /* 파이어폭스 */
+        }
+        body.scrollon{
+            height: 100%;
+            overflow: auto;
+        }
+        .cntwrap{
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;left: 0;
+            opacity: 0;
+            transition: all 0.5s;
+            transform: translate(0,100vh);
+        }
+        .cntwrap05, .cntwrap07{
+            position: absolute;
+            height: 300vh;
+        }
+        .cntwrap.prev{
+            opacity: 1;
+            transform: translate(0,0);
+        }
+        .cntwrap.on{
+            opacity: 1;
+            transform: translate(0,0);
+            width: 100vw;
+        }
+        
+        .cntwrap .content{
+            display: inline-block;
+            position: absolute;
+            margin: auto;
+            top: 0;left: 0;right: 0;bottom: 0;
+            font-size: 72px;
+            color: #fff;
+        }
+        h2{
+            font-size: 45px;
+            line-height: 60px;
+        }
+        .cnt01{
+            background-color: orange;
+        }
+        .cnt02{
+            background-color: violet;
+        }
+        .cnt03{
+            background-color: aqua;
+        }
+        .cnt04{
+            background-color: antiquewhite;
+        }
+        .cnt05{
+            background-color: cadetblue;
+        }
+        .content.cnt06{
+            background-color: orange;
+        }
+        .cnt07{
+            background-color: brown;
+        }
+        .cnt08{
+            background-color: darkgrey;
+        }
+        .cnt09{
+            background-color: cadetblue;
+        }
+        div.ftrwrap{
+            background-color: #ccc;
+            height: 20vh;
+            position: absolute;
+            width: 100vw;
+            top: 0;left: 0;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="cntwrap on">
+        <div class="content cnt01">
+            <h2><span>안녕하세요, 반가워요!</span></h2>
+            <h2><span>이게 뭐든 해야겠지요?</span></h2>
+        </div>
+    </div>
+    <div class="cntwrap">
+        <div class="content cnt02">
+            <h2><span>안</span><span>안</span><span>안</span><span>안</span><span>안</span><span>안</span></h2>
+        </div>
+    </div>
+    <div class="cntwrap">
+        <div class="content cnt03">3</div>
+    </div>
+    <div class="cntwrap">
+        <div class="content cnt04">4</div>
+    </div>
+    <div class="cntwrap scrollon cntwrap05">
+        <div class="content cnt05">
+            <h2>이것은 헤더임당</h2>
+            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Facere quod ipsam ex eveniet rem odio sequi iste optio explicabo quos sint earum tempore in aperiam maxime, unde similique qui quaerat.</p>
+        </div>
+    </div>
+    <div class="cntwrap">
+        <div class="content cnt06">6</div>
+    </div>
+    <div class="cntwrap cntwrap07 scrollon">
+        <div class="content cnt07">
+            <h2>이것은 헤더임당</h2>
+            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Facere quod ipsam ex eveniet rem odio sequi iste optio explicabo quos sint earum tempore in aperiam maxime, unde similique qui quaerat.</p>
+        </div>
+    </div>
+    <div class="cntwrap cntwrap08">
+        <div class="content cnt08 ">
+            <div class="content cnt08">
+                <h2>이것은 헤더임당</h2>
+                <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Facere quod ipsam ex eveniet rem odio sequi iste optio explicabo quos sint earum tempore in aperiam maxime, unde similique qui quaerat.</p>
+            </div>
+        </div>
+    </div>
+    <div class="cntwrap">
+        <div class="content cnt09">9</div>
+    </div>
+    <div class="ftrwrap">
+        <footer>
+            footer
+        </footer>
+    </div>
+
+    <script>
+        let _index= 0;
+        let flag= false;
+        let scrollon = false;
+        let end ='';
+        const body =  document.querySelector('body');
+        const pages = document.querySelectorAll('.cntwrap');
+        
+        function classOnce(dom,name){
+            if(!dom.classList.contains(name))dom.className += name;
+        }
+        function addclass(dom,idx,name){
+            dom[idx].className +=` ${name}`;
+            dom[idx-1].classList.replace(name,'prev');
+        }
+        function rmclass(dom,name){
+            dom.classList.remove(name);
+        }
+        
+        function aniEnd(dom){
+            return new Promise( r=>{
+                dom.addEventListener('transitionend',()=>{
+                    clearTimeout(end);
+                    end = setTimeout(()=>{flag=false; !scrollon?window.scrollTo(0,0):'';},100);
+                })
+            });
+        }
+
+        function scrolls(e){
+            classOnce(body,'scrollon');
+                flag=true;
+                if(e.deltaY>0 && pages[_index].clientHeight - (window.scrollY+window.innerHeight)<80){
+                    rmclass(body,'scrollon');
+                    flag=false;
+                    scrollon=false;
+                    pagemv(e.deltaY>0,_index++);
+                }else if(e.deltaY<0 && (window.scrollY+window.innerHeight)-window.innerHeight ===0){
+                    rmclass(body,'scrollon');
+                    flag=false;
+                    scrollon=false;
+                    pagemv(e.deltaY>0,_index--);
+                }
+        }
+        const pagemv=async (dir,idx)=>{
+            if(!flag){
+                if(dir && _index < pages.length-1){
+                    !idx?_index++:'';
+                    flag = true;
+                    addclass(pages,_index,'on');
+                    await aniEnd(pages[_index]);   
+                }else if(!dir && _index>0){
+                    !idx?_index--:'';
+                    flag=true;
+                    rmclass(pages[_index+1],'on');
+                    rmclass(pages[_index+1],'prev');
+                    rmclass(pages[_index+1],'done');
+                    aniEnd(pages[_index+1]);
+                }
+            }
+        }
+        
+        window.onbeforeunload = function () {
+            window.scrollTo(0, 0);
+        }
+
+        window.addEventListener('wheel',(e)=>{
+            if(pages[_index].classList.contains('scrollon')){
+                scrollon = true;
+            }
+            if(!scrollon){
+                pagemv(e.deltaY>0,false);
+            }else{
+                scrolls(e);
+            }
+        }, {passive:false});
+    </script>
+</body>
+</html>
